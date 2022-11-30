@@ -1,4 +1,6 @@
-<footer class="w-full bg-slate-600/70 px-6 pb-4 pt-2 text-white mt-4">
+<footer
+	class="w-full flex justify-between bg-purple-300/20 backdrop-blur-md px-6 pt-4 pb-2 text-xl font-bold mt-4"
+>
 	<nav>
 		<ul>
 			<li>

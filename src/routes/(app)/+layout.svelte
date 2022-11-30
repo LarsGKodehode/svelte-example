@@ -9,8 +9,7 @@
 
 <div class="h-screen relative flex flex-col">
 	<div
-		class="h-screen w-full bg-no-repeat bg-center bg-cover fixed -z-10"
-		style="background-image: url({backgroundImageURL})"
+		class="h-screen w-full bg-no-repeat bg-center bg-cover fixed -z-10 bg-[url('{backgroundImageURL}')]"
 	/>
 
 	<Navbar />
