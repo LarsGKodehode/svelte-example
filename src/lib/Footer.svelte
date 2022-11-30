@@ -1,4 +1,4 @@
-<footer class="w-full bg-slate-600/70 px-6 pb-4 pt-2 text-white">
+<footer class="w-full bg-slate-600/70 px-6 pb-4 pt-2 text-white mt-4">
 	<nav>
 		<ul>
 			<li>
