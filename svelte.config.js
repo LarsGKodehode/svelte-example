@@ -1,4 +1,3 @@
-import adapter from '@sveltejs/adapter-auto';
 import preprocess from 'svelte-preprocess';
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -12,16 +11,13 @@ const config = {
 	],
 
 	kit: {
-		// Using the static adaptor here
-		// see https://kit.svelte.dev/docs/adapter-static
-		adapter: adapter({
-      pages: 'build',
-      assets: 'build',
-      fallback: null,
-      precompress: false,
-      strict: true
-    })
-	}
+    paths: {
+      base: '/svelte-example',
+    },
+    // If you are not using a .nojekyll file, change your appDir to something not starting with an underscore.
+    // For example, instead of '_app', use 'app_', 'internal', etc.
+    appDir: 'internal',
+  }
 };
 
 export default config;
