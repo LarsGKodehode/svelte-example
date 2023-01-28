@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Section from '$lib/Section.svelte';
-
-	import { onMount } from 'svelte';
+	import PromiseWrapper from '$lib/PromiseWrapper.svelte';
 
 	/**
 	 * First query to API endpoint
@@ -9,6 +8,7 @@
 	type PokemonData = {
 		name: string;
 		url: string;
+		info: PokemonInfo | Promise<PokemonInfo> | undefined;
 	};
 
 	type Types = {
@@ -32,68 +32,55 @@
 	// List parameters
 	const stride = 16;
 	let currentOffset = 0;
+
+	let query = `https://pokeapi.co/api/v2/pokemon/?offset=${currentOffset}&limit=${stride}`;
+
+	let pokemonList: PokemonData[] = [];
 	let selectedPokemon = 0;
 
-	let pokemonList: PokemonInfo[];
-	let query = `https://pokeapi.co/api/v2/pokemon/?offset=${currentOffset}&limit=${stride}`;
 	let isLoading: Promise<boolean> = fetchData();
 
 	function fetchData(): Promise<boolean> {
 		return new Promise(async (resolve, rejected) => {
-			console.log('running fetch');
-			const response = await fetch(query);
-			const data = await response.json();
+			// get primary list of pokemons
+			const primaryResponsee = await fetch(query);
+			const primaryData = (await primaryResponsee.json()) as { results: PokemonData[] };
 
-			const responses: Promise<PokemonInfo>[] = data.results.map(
-				async (pokemon: PokemonData): Promise<PokemonInfo> => {
-					return fetch(pokemon.url).then((responseObject) => responseObject.json());
-				}
-			);
-			Promise.all(responses)
-				.then((results) => (pokemonList = results))
-				.then(() => resolve(false));
+			pokemonList.push(...primaryData.results);
+
+			resolve(false);
+			// fill out info with recieved URLS
+		});
+	}
+
+	function requestData(url: string, callback: () => void): Promise<false> {
+		return new Promise(async (resolve, reject) => {
+			const response = await fetch(url);
+			const data = (await response.json()) as { results: any };
+
+			store.push(...data.results);
+
+			resolve(false);
 		});
 	}
 </script>
 
 <Section>
-	<div class="flex">
-		{#await isLoading}
-			<!-- promise is pending -->
-			<p>Loading data...</p>
-		{:then value}
-			<!-- promise was fulfilled -->
-			<!-- Pokemon selector -->
-			<div class="">
-				<h2>Details</h2>
-				<ul class="grid grid-cols-4">
-					{#each pokemonList as pokemon, index}
-						<li
-							class="border border-white m-2 p-4 rounded-md list-none bg-slate-600/70"
-							on:click={() => {
-								selectedPokemon = index;
-							}}
-							on:keypress
-						>
-							<h3>{pokemon.name.toUpperCase()}</h3>
-							<img class="w-16 h-16" src={pokemon.sprites.front_default} alt="" />
-						</li>
-					{/each}
-				</ul>
-			</div>
-			<!-- Pokemon detail -->
-			<div class="mx-4 p-4 border border-white/50 rounded-l-xl min-w-[10rem]">
-				<h2>Details</h2>
-				<h3>{pokemonList[selectedPokemon].name}</h3>
-				<h4>types</h4>
-				{#each pokemonList[selectedPokemon].types as type}
-					<h5>{type.type.name}</h5>
-					<img src={type.type.url} alt="" />
-				{/each}
-			</div>
-		{:catch error}
-			<!-- promise was rejected -->
-			<p>Something went wrong: {error.message}</p>
-		{/await}
+	<div class="grid grid-cols-4">
+		<PromiseWrapper
+			promise={requestData(query, (data) => {
+				pokemonList.push(...data);
+			})}
+		>
+			{#each pokemonList as pokemon}
+				<div class="p-2 m-4 border-2 border-white rounded-md">
+					<h2>{pokemon.name}</h2>
+					<PromiseWrapper let:optional promise={requestData(pokemon.url, pokemon.info)}>
+						{console.log(pokemon)}
+						<img src={optional} alt="" />
+					</PromiseWrapper>
+				</div>
+			{/each}
+		</PromiseWrapper>
 	</div>
 </Section>

@@ -12,7 +12,15 @@ const config = {
 	],
 
 	kit: {
-		adapter: adapter()
+		// Using the static adaptor here
+		// see https://kit.svelte.dev/docs/adapter-static
+		adapter: adapter({
+      pages: 'build',
+      assets: 'build',
+      fallback: null,
+      precompress: false,
+      strict: true
+    })
 	}
 };
 
