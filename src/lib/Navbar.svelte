@@ -3,8 +3,8 @@
 
 	const pages = [
 		{ titel: 'Home', to: '/' },
-		{ titel: 'About', to: '/about' },
-		{ titel: 'Pokemon', to: '/pokemon' }
+		{ titel: 'About', to: 'about' },
+		{ titel: 'Pokemon', to: 'pokemon' }
 	];
 </script>
 
